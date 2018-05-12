@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<canvas id = "disp" width="600" height="600"></canvas>
+<p>A (lazy) implementation of
+  <a href = "https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life">conway's game of life</a>. Click to toggle cells, spacebar to pause/play.
+</p>
+
+<script>
+
+const GRID_SIZE = 10;
+const WORLD_SIZE = 600/GRID_SIZE;
+const FPS = 5;
+var swap = false;//use 0th index as the current, 1st as buffer
+var grid;
+var running = false;
+
+window.onload = function() {
+  canvas = document.getElementById('disp');
+  context = canvas.getContext('2d');
+  grid = [];
+  for(x = 0; x < WORLD_SIZE; x++) {
+    grid[x] = [];
+    for(y = 0; y < WORLD_SIZE; y++){
+      grid[x][y] = [false, false];
+    }
+  }
+  document.addEventListener("keydown", handleKeys);
+  document.addEventListener("click", handleMouseClick);
+  setInterval(repaint, 1000/FPS);
+}
+
+function repaint() {
+  context.fillStyle = "black";
+  context.fillRect(GRID_SIZE, GRID_SIZE, canvas.width - GRID_SIZE, canvas.height - GRID_SIZE);
+  context.fillStyle = "white";
+  for(x = 1; x < grid.length - 1; x++) {
+    for(y = 1; y < grid[x].length - 1; y++) {
+      if(swap ? grid[x][y][1] : grid[x][y][0])
+      {
+        context.fillRect(x * GRID_SIZE, y * GRID_SIZE, GRID_SIZE, GRID_SIZE);
+      }
+      if(running) {
+        nextGen(x, y);
+      }
+    }
+  }
+  if(running) {
+    swap = !swap;
+  }
+}
+
+function nextGen(x, y) {
+  var whichBuffer = swap ? [0, 1] : [1, 0]; //[current, buffer]
+  var nAlive = 0;
+
+  for(i = -1; i <= 1 && nAlive < 4; i++) {
+    for(j= -1; j <= 1; j++) {
+      if(j !=0 || i != 0) {
+        if(grid[x + i][y + j][whichBuffer[1]]) {
+          nAlive++;
+        }
+      }
+    }
+  }
+
+  if(grid[x][y][whichBuffer[1]]) {
+    grid[x][y][whichBuffer[0]] = nAlive > 1 && nAlive < 4;
+  } else {
+    grid[x][y][whichBuffer[0]] = nAlive === 3;
+  }
+}
+
+function handleKeys(evt) {
+  if(evt.keyCode === 32) {
+    running = !running;
+  }
+}
+
+function getMousePos(evt) {
+    var rect = canvas.getBoundingClientRect();
+    return {
+      x: Math.round((evt.clientX - rect.left)/GRID_SIZE),
+      y: Math.round((evt.clientY - rect.top)/GRID_SIZE)
+    };
+}
+
+function handleMouseClick(evt) {
+  var mousePos = getMousePos(evt);
+  grid[mousePos.x][mousePos.y][swap ? 1 : 0] = !grid[mousePos.x][mousePos.y][swap ? 1 : 0];
+}
+
+</script>
+
+</html>

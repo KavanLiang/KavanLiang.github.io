@@ -105,6 +105,7 @@ footer {
   max-width: 400;
   min-height: 400;
   max-height: 400;
+  display: "block";
 }
 
 @media screen and (max-width:800px) {
