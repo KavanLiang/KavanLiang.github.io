@@ -2,8 +2,13 @@
 <html>
 <canvas id = "disp" width="600" height="600"></canvas>
 <p>A (lazy) implementation of
-  <a href = "https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life">conway's game of life</a>. Click to toggle cells, spacebar to pause/play.
+  <a href = "https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life">conway's game of life</a>.
 </p>
+<ul>
+  <li>Click to toggle cells</li>
+  <li>Spacebar to pause/play</li>
+  <li>'R' to randomize the population </li>
+</ul>
 
 <script>
 
@@ -18,9 +23,9 @@ window.onload = function() {
   canvas = document.getElementById('disp');
   context = canvas.getContext('2d');
   grid = [];
-  for(x = 0; x < WORLD_SIZE; x++) {
+  for(var x = 0; x < WORLD_SIZE; x++) {
     grid[x] = [];
-    for(y = 0; y < WORLD_SIZE; y++){
+    for(var y = 0; y < WORLD_SIZE; y++){
       grid[x][y] = [false, false];
     }
   }
@@ -33,8 +38,8 @@ function repaint() {
   context.fillStyle = "black";
   context.fillRect(GRID_SIZE, GRID_SIZE, canvas.width - GRID_SIZE, canvas.height - GRID_SIZE);
   context.fillStyle = "white";
-  for(x = 1; x < grid.length - 1; x++) {
-    for(y = 1; y < grid[x].length - 1; y++) {
+  for(var x = 1; x < grid.length - 1; x++) {
+    for(var y = 1; y < grid[x].length - 1; y++) {
       if(swap ? grid[x][y][1] : grid[x][y][0])
       {
         context.fillRect(x * GRID_SIZE, y * GRID_SIZE, GRID_SIZE, GRID_SIZE);
@@ -53,8 +58,8 @@ function nextGen(x, y) {
   var whichBuffer = swap ? [0, 1] : [1, 0]; //[current, buffer]
   var nAlive = 0;
 
-  for(i = -1; i <= 1 && nAlive < 4; i++) {
-    for(j= -1; j <= 1; j++) {
+  for(var i = -1; i <= 1 && nAlive < 4; i++) {
+    for(var j= -1; j <= 1; j++) {
       if(j !=0 || i != 0) {
         if(grid[x + i][y + j][whichBuffer[1]]) {
           nAlive++;
@@ -71,6 +76,9 @@ function nextGen(x, y) {
 }
 
 function handleKeys(evt) {
+  if(evt.keyCode === 82) {
+    randomizePopultion();
+  }
   if(evt.keyCode === 32) {
     running = !running;
   }
@@ -87,6 +95,14 @@ function getMousePos(evt) {
 function handleMouseClick(evt) {
   var mousePos = getMousePos(evt);
   grid[mousePos.x][mousePos.y][swap ? 1 : 0] = !grid[mousePos.x][mousePos.y][swap ? 1 : 0];
+}
+
+function randomizePopultion() {
+  for(var x = 0; x < grid.length; x++) {
+    for(var y = 0; y < grid.length; y++) {
+      grid[x][y][swap ? 1 : 0] = Math.random() >= 0.5 ? true : false;
+    }
+  }
 }
 
 </script>
